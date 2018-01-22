@@ -1,4 +1,4 @@
-# Will people like your image?
+# Will People like Your Image?
 
 TensorFlow implementation of estimating image aesthetics
 
@@ -6,6 +6,7 @@ TensorFlow implementation of estimating image aesthetics
 Katharina Schwarz Patrick Wieschollek, Hendrik P.A. Lensch<br>
 *WACV 2018*
 
+<p align="center"> <img src="./teaser.jpg" width="100%"> </p>
 
 ## Training
 
@@ -24,3 +25,8 @@ user@host $ python gui.py # use the GUI to display the video and the scores
 ```
 
 Click `Load Video` and select the original high-res video.
+
+## Training Data
+
+The file `arod/list.txt` provides the url to images used during training. The format is `url;faves;views`.
+
