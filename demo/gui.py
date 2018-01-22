@@ -14,30 +14,31 @@ from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QStatusBar
 from main import Ui_MainWindow  # here you need to correct the names
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+# from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
 
 import numpy as np
 import h5py
-import random
 import cv2
 import sys
 import os
 import math
-import subprocess
 
-# app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
+# app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da;
+# border: 1px solid white; }")
 
 white = QtGui.QColor(255, 255, 255)
 red = QtGui.QColor(255, 0, 0)
 black = QtGui.QColor(0, 0, 0)
+
 
 def dark():
     dark_palette = QtGui.QPalette()
     dark_palette.setColor(QtGui.QPalette.Window, QtGui.QColor(53, 53, 53))
     dark_palette.setColor(QtGui.QPalette.WindowText, white)
     dark_palette.setColor(QtGui.QPalette.Base, QtGui.QColor(25, 25, 25))
-    dark_palette.setColor(QtGui.QPalette.AlternateBase, QtGui.QColor(53, 53, 53))
+    dark_palette.setColor(QtGui.QPalette.AlternateBase,
+                          QtGui.QColor(53, 53, 53))
     dark_palette.setColor(QtGui.QPalette.ToolTipBase, white)
     dark_palette.setColor(QtGui.QPalette.ToolTipText, white)
     dark_palette.setColor(QtGui.QPalette.Text, white)
@@ -54,7 +55,7 @@ def dark():
 app = QApplication(sys.argv)
 
 
-def kalman(tour, R=1e-5, Q=1e-5): # noqa
+def kalman(tour, R=1e-5, Q=1e-5):  # noqa
     print tour.shape
     assert len(tour.shape) == 1
     m = tour.shape[0]
@@ -62,10 +63,10 @@ def kalman(tour, R=1e-5, Q=1e-5): # noqa
     z = np.copy(tour)
 
     xhat = np.zeros((m,))
-    P = np.zeros((m,)) # noqa
+    P = np.zeros((m,))  # noqa
     xhatminus = np.zeros((m,))
-    Pminus = np.zeros((m,)) # noqa
-    K = np.zeros((m,)) # noqa
+    Pminus = np.zeros((m,))  # noqa
+    K = np.zeros((m,))  # noqa
 
     xhat[0] = tour[0]
     P[0] = tour[0]
@@ -82,20 +83,23 @@ def kalman(tour, R=1e-5, Q=1e-5): # noqa
 
     return xhat
 
+
 class MplCanvas(FigureCanvas):
     """Class to represent the FigureCanvas widget"""
+
     def __init__(self, trigger):
-        self.fig = plt.figure()        
+        self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111)
         self.trigger = trigger
 
         FigureCanvas.__init__(self, self.fig)
-        FigureCanvas.setSizePolicy(self, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        FigureCanvas.setSizePolicy(
+            self, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-        self.fig.canvas.mpl_connect('button_press_event',self._on_press)
+        self.fig.canvas.mpl_connect('button_press_event', self._on_press)
 
-    def _on_press(self,event):
+    def _on_press(self, event):
         if self.trigger:
             if event.xdata is not None:
                 self.trigger(event.xdata)
@@ -103,12 +107,13 @@ class MplCanvas(FigureCanvas):
 
 class MplWidget(QtWidgets.QWidget):
     """Widget defined in Qt Designer"""
-    def __init__(self, trigger=None, parent = None):
+
+    def __init__(self, trigger=None, parent=None):
         QtWidgets.QWidget.__init__(self, parent)
 
         self.canvas = MplCanvas(trigger)
 
-        self.canvas.setFocusPolicy( QtCore.Qt.ClickFocus )
+        self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.canvas.setFocus()
 
         self.vbl = QtWidgets.QVBoxLayout()
@@ -119,38 +124,40 @@ class MplWidget(QtWidgets.QWidget):
 
 class Overlay(QWidget):
 
-    def __init__(self, parent = None, gui=None):
-    
+    def __init__(self, parent=None, gui=None):
+
         QWidget.__init__(self, parent)
         palette = QtGui.QPalette(self.palette())
         palette.setColor(palette.Background, QtCore.Qt.transparent)
         self.setPalette(palette)
         self.gui = gui
-    
+
     def paintEvent(self, event):
-    
+
         painter = QtGui.QPainter()
         painter.begin(self)
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
-        painter.fillRect(event.rect(), QtGui.QBrush(QtGui.QColor(255, 255, 255, 127)))
+        painter.fillRect(event.rect(), QtGui.QBrush(
+            QtGui.QColor(255, 255, 255, 127)))
         painter.setPen(QtGui.QPen(QtCore.Qt.NoPen))
-        
+
         for i in range(6):
             if (self.counter / 5) % 6 == i:
-                painter.setBrush(QtGui.QBrush(QtGui.QColor(127 + (self.counter % 5)*32, 127, 127)))
+                painter.setBrush(QtGui.QBrush(QtGui.QColor(
+                    127 + (self.counter % 5) * 32, 127, 127)))
             else:
                 painter.setBrush(QtGui.QBrush(QtGui.QColor(127, 127, 127)))
             painter.drawEllipse(
-                self.width()/2 + 30 * math.cos(2 * math.pi * i / 6.0) - 10,
-                self.height()/2 + 30 * math.sin(2 * math.pi * i / 6.0) - 10,
+                self.width() / 2 + 30 * math.cos(2 * math.pi * i / 6.0) - 10,
+                self.height() / 2 + 30 * math.sin(2 * math.pi * i / 6.0) - 10,
                 20, 20)
-        
+
         painter.end()
-    
+
     def showEvent(self, event):
         self.timer = self.startTimer(50)
         self.counter = 0
-    
+
     def timerEvent(self, event):
         self.counter += 1
         self.update()
@@ -164,6 +171,7 @@ class Overlay(QWidget):
 
 
 class ExampleApp(QMainWindow, Ui_MainWindow):
+
     def __init__(self):
         super(self.__class__, self).__init__()
         self.setupUi(self)
@@ -186,7 +194,6 @@ class ExampleApp(QMainWindow, Ui_MainWindow):
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
 
-
         self.info_label = QtWidgets.QLabel()
         self.frame_label = QtWidgets.QLabel()
         self.statusBar.addWidget(self.info_label)
@@ -200,7 +207,8 @@ class ExampleApp(QMainWindow, Ui_MainWindow):
         event.accept()
 
     def loadVideo(self):
-        fn = QtWidgets.QFileDialog.getOpenFileName(self, 'Video File', '', filter='*.mp4')
+        fn = QtWidgets.QFileDialog.getOpenFileName(
+            self, 'Video File', '', filter='*.mp4')
         if fn:
             self.continue_gui = False
             self.overlay.show()
@@ -221,18 +229,20 @@ class ExampleApp(QMainWindow, Ui_MainWindow):
             self.continue_gui = True
 
     def displayImg(self, frame):
-        w_width = self.frameGeometry().width()
+        # w_width = self.frameGeometry().width()
         w_height = self.frameGeometry().height()
 
         height, width = frame.shape[:2]
 
-        if height > w_height*0.8:
-            scale = w_height*0.8 / float(height)
-            frame = cv2.resize(frame, (0,0), fx=scale, fy=scale)
+        if height > w_height * 0.8:
+            scale = w_height * 0.8 / float(height)
+            frame = cv2.resize(frame, (0, 0), fx=scale, fy=scale)
             height, width = frame.shape[:2]
 
-        data = np.array(frame[:, :, ::-1], dtype=np.uint8) # np.zeros((height, width, 3), dtype=np.uint8)
-        q_img = QtGui.QImage(data, width, height, 3 * width, QtGui.QImage.Format_RGB888)
+        # np.zeros((height, width, 3), dtype=np.uint8)
+        data = np.array(frame[:, :, ::-1], dtype=np.uint8)
+        q_img = QtGui.QImage(data, width, height, 3 *
+                             width, QtGui.QImage.Format_RGB888)
         pixmap01 = QtGui.QPixmap.fromImage(q_img)
         self.image_preview.setPixmap(pixmap01)
         self.image_preview.setFixedWidth(width)
@@ -241,7 +251,8 @@ class ExampleApp(QMainWindow, Ui_MainWindow):
     def showFrame(self, frame_id):
         self.frame_id = int(frame_id)
         if self.data is not None and self.frame_id is not None:
-            self.frame_label.setText("frame: %i, score: %f" % (self.frame_id, self.data[self.frame_id]))
+            self.frame_label.setText("frame: %i, score: %f" % (
+                self.frame_id, self.data[self.frame_id]))
         self.cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id)
         success, self.frame = self.cap.read()
         self.displayImg(self.frame)
@@ -268,10 +279,10 @@ class ExampleApp(QMainWindow, Ui_MainWindow):
             ax = self.plotWidget.canvas.fig.add_subplot(111, axisbg='#353535')
             ax.get_xaxis().set_visible(False)
             ax.get_yaxis().set_visible(False)
-            ax.plot(self.data, '#2a82da' ) #'#0ef42d')
+            ax.plot(self.data, '#2a82da')  # '#0ef42d')
             ax.axis('off')
-            ax.set_xlim([0,len(self.data)])
-            ax.set_ylim([0,1])
+            ax.set_xlim([0, len(self.data)])
+            ax.set_ylim([0, 1])
             if self.frame_id:
                 ax.axvline(x=self.frame_id, color='#f57c00')
             self.plotWidget.canvas.draw()

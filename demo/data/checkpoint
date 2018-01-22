@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/wieschol/projects/deepaesthetics/code/publish/data/ae_model"
+all_model_checkpoint_paths: "/home/wieschol/projects/deepaesthetics/code/publish/data/ae_model"
