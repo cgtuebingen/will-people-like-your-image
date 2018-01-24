@@ -7,6 +7,10 @@
 Will People Like Your Image?
 
 tested with TensorFlow 1.1.0-rc1 (git rev-parse HEAD 45115c0a985815feef3a97a13d6b082997b38e5d) and OpenCV 3.1.0
+
+EXAMPLE:
+
+    python score.py --images "pattern/to/images/*.jpg"
 """
 
 import tensorflow as tf
