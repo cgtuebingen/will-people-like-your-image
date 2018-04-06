@@ -10,7 +10,7 @@ Katharina Schwarz Patrick Wieschollek, Hendrik P.A. Lensch<br>
 
 ## Training
 
-The original model was trained on an out-dated TensorFlow training interface. Hre, we provide a multi-GPU training script based on TensorPack.
+The original model was trained on an out-dated TensorFlow training interface. Here, we provide a multi-GPU training script based on TensorPack.
 For more details, see the training directory.
 
 ## Video Spotting
